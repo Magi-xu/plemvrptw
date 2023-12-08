@@ -16,28 +16,27 @@ namespace vrptw {
                  const int& x,
                  const int& y,
                  const int& demand,
-                 const int& readyTime,
-                 const int& dueTime,
-                 const int& serviceTime);
+                 const double& readyTime,
+                 const double& dueTime,
+                 const double& serviceTime);
 
-        const int& getId() const { return id;}
-        const int& getX() const { return x;}
-        const int& getY() const { return y;}
-        const int& getDemand() const { return demand;}
-        const int& getReadyTime() const { return readyTime;}
-        const int& getDueTime() const { return dueTime;}
-        const int& getServiceTime() const { return serviceTime;}
+        [[nodiscard]] const int& getId() const { return id;}
+        [[nodiscard]] const int& getX() const { return x;}
+        [[nodiscard]] const int& getY() const { return y;}
+        [[nodiscard]] const int& getDemand() const { return demand;}
+        [[nodiscard]] const double& getReadyTime() const { return readyTime;}
+        [[nodiscard]] const double& getDueTime() const { return dueTime;}
+        [[nodiscard]] const double& getServiceTime() const { return serviceTime;}
     private:
         int id;
         int x;
         int y;
         int demand;
-        int readyTime;
-        int dueTime;
-        int serviceTime;
+        double readyTime;
+        double dueTime;
+        double serviceTime;
     };
+
 } // vrptw
-
-
 
 #endif //PLEMVRPTW_CUSTOMER_H

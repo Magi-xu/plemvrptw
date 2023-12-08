@@ -8,7 +8,6 @@
 #include <vector>
 #include <memory>
 
-#include "Problem.h"
 #include "Customer.h"
 
 namespace vrptw {
@@ -16,24 +15,25 @@ namespace vrptw {
     class Route {
     public:
         typedef std::shared_ptr<Route> ptr;
-        Route(const std::vector<Customer::ptr> customers,
-              const std::vector<std::vector<float>>& distanceMatrix,
-              const std::vector<std::vector<float>>& timeMatrix);
+        Route(const std::vector<Customer::ptr>& customers,
+              const std::vector<std::vector<double>>& distanceMatrix,
+              const std::vector<std::vector<double>>& timeMatrix);
 
-        const std::vector<Customer::ptr> getCustomers() const { return customers;}
-        const int& getLoad() const { return load;}
-        const float& getTravleDistance() const { return travleDistance;}
-        const float& getTravleTime() const { return travleTime;}
-        const float& getWaitTime() const { return waitTime;}
-        const float& getDelayTime() const { return delayTime;}
+        [[nodiscard]] std::vector<Customer::ptr> getCustomers() const { return customers;}
+        [[nodiscard]] const int& getLoad() const { return load;}
+        [[nodiscard]] const double& getTravleDistance() const { return travleDistance;}
+        [[nodiscard]] const double& getTravleTime() const { return travleTime;}
+        [[nodiscard]] const double& getWaitTime() const { return waitTime;}
+        [[nodiscard]] const double& getDelayTime() const { return delayTime;}
+        [[nodiscard]] const std::vector<double>& getDelayTimeMatrix() const { return delayTimeMatrix;}
     private:
         std::vector<Customer::ptr> customers;
-        int load = 0;
-        float travleDistance = 0;
-        float travleTime = 0;
-        float waitTime = 0;
-        float delayTime = 0;
-        std::vector<float> delayTimeMatrix;
+        int load;
+        double travleDistance;
+        double travleTime;
+        double waitTime;
+        double delayTime;
+        std::vector<double> delayTimeMatrix;
     };
 
 } // vrptw

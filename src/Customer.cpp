@@ -5,13 +5,14 @@
 #include "Customer.h"
 
 namespace vrptw {
+
     Customer::Customer(const int& id,
                        const int& x,
                        const int& y,
                        const int& demand,
-                       const int& readyTime,
-                       const int& dueTime,
-                       const int& serviceTime)
+                       const double& readyTime,
+                       const double& dueTime,
+                       const double& serviceTime)
         : id(id),
           x(x),
           y(y),
@@ -19,4 +20,5 @@ namespace vrptw {
           readyTime(readyTime),
           dueTime(dueTime),
           serviceTime(serviceTime) { }
-}
+
+} // vrptw

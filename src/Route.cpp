@@ -6,11 +6,11 @@
 
 namespace vrptw {
 
-    Route::Route(const std::vector<Customer::ptr> customers,
-                 const std::vector<std::vector<float>>& distanceMatrix,
-                 const std::vector<std::vector<float>>& timeMatrix)
-        : customers(customers) {
-        delayTimeMatrix = std::vector<float> (customers.size());
+    Route::Route(const std::vector<Customer::ptr>& customers,
+                 const std::vector<std::vector<double>>& distanceMatrix,
+                 const std::vector<std::vector<double>>& timeMatrix)
+        : customers(customers), load(0), travleDistance(0), travleTime(0), waitTime(0), delayTime(0) {
+        delayTimeMatrix = std::vector<double> (customers.size());
         for (int i = 1; i < customers.size(); ++i) {
             load += customers[i]->getDemand();
             travleDistance += distanceMatrix[i - 1][i];

@@ -16,32 +16,38 @@ namespace vrptw {
     class Problem {
     public:
         typedef std::shared_ptr<Problem> ptr;
-        Problem(const std::string& filename);
+        explicit Problem(const std::string& filename);
 
-        const std::string& getName() const { return name;}
-        const int& getVehicleNumber() const { return vehicleNumber;}
-        const int& getCapacity() const { return capacity;}
-        const std::vector<Customer::ptr> getCustomers() const { return customers;}
-        const int getCustomerNumber() const { return customers.size();}
+        [[nodiscard]] const std::string& getName() const { return name;}
+        [[nodiscard]] const int& getVehicleNumber() const { return vehicleNumber;}
+        [[nodiscard]] const int& getCapacity() const { return capacity;}
+        [[nodiscard]] std::vector<Customer::ptr> getCustomers() const { return customers;}
+        [[nodiscard]] size_t getCustomerNumber() const { return customers.size() - 1;}
+        [[nodiscard]] Customer::ptr getCustomerById(const int& id) const { return customers[id];}
+        [[nodiscard]] Customer::ptr getDepot() const { return customers[0];}
 
-        void setVehicleSpeed(const int& speed) { vehicleSpeed = speed;}
-        void setMaxDelayTime(const int& time) { maxDelayTime = time;}
-        void setMaxReturnTime(const int& time) { maxReturnTime = time;}
+        void setVehicleSpeed(const double& speed) { vehicleSpeed = speed;}
+        void setMaxDelayTime(const double& time) { maxDelayTime = time;}
+        [[nodiscard]] const double& getMaxDelayTime() const { return maxDelayTime;}
+        void setMaxReturnTime(const double& time) { maxReturnTime = time;}
+        [[nodiscard]] const double& getMaxReturnTime() const { return maxReturnTime;}
 
         void setDistanceMatrix();
+        [[nodiscard]] const std::vector<std::vector<double>>& getDistanceMatrix() const { return distanceMatrix;}
         void setTimeMatrix();
+        [[nodiscard]] const std::vector<std::vector<double>>& getTimeMatrix() const { return timeMatrix;}
     private:
         std::string name;
         int vehicleNumber;
         int capacity;
         std::vector<Customer::ptr> customers;
 
-        int vehicleSpeed;
-        int maxDelayTime;
-        int maxReturnTime;
+        double vehicleSpeed = 1;
+        double maxDelayTime = 0;
+        double maxReturnTime = 0;
 
-        std::vector<std::vector<float>> distanceMatrix;
-        std::vector<std::vector<float>> timeMatrix;
+        std::vector<std::vector<double>> distanceMatrix;
+        std::vector<std::vector<double>> timeMatrix;
     };
 
 } // vrptw

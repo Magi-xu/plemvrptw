@@ -5,11 +5,12 @@
 #ifndef PLEMVRPTW_PLEMVRPTW_H
 #define PLEMVRPTW_PLEMVRPTW_H
 
-#include "EA.h"
-#include "MLP.h"
-#include "Problem.h"
-#include "Customer.h"
-#include "Route.h"
-#include "Solution.h"
+#include "EA.cpp"
+// #include "MLP.h"
+#include "Problem.cpp"
+#include "Customer.cpp"
+#include "Route.cpp"
+#include "Solution.cpp"
+#include "util.h"
 
 #endif //PLEMVRPTW_PLEMVRPTW_H
