@@ -5,8 +5,6 @@
 #ifndef PLEMVRPTW_EA_H
 #define PLEMVRPTW_EA_H
 
-#include <memory>
-
 #include "Problem.h"
 #include "Solution.h"
 

@@ -5,7 +5,6 @@
 #include "Problem.h"
 #include <iostream>
 #include <fstream>
-#include <memory>
 #include <sstream>
 #include <cmath>
 

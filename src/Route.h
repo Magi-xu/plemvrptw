@@ -6,7 +6,6 @@
 #define PLEMVRPTW_ROUTE_H
 
 #include <vector>
-#include <memory>
 
 #include "Customer.h"
 

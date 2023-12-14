@@ -4,7 +4,6 @@
 
 #include "EA.h"
 
-#include <memory>
 #include <utility>
 #include <numeric>
 #include <algorithm>
@@ -77,6 +76,7 @@ namespace vrptw {
                 ++i;
             }
             std::vector<Route::ptr> r;
+            r.reserve(routes.size());
             for (auto& route : routes) {
                 r.push_back(std::make_shared<Route>(route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
             }
@@ -130,6 +130,7 @@ namespace vrptw {
                 ++i;
             }
             std::vector<Route::ptr> r;
+            r.reserve(routes.size());
             for (auto& route : routes) {
                 r.push_back(std::make_shared<Route>(route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
             }
@@ -183,6 +184,7 @@ namespace vrptw {
                 ++i;
             }
             std::vector<Route::ptr> r;
+            r.reserve(routes.size());
             for (auto& route : routes) {
                 r.push_back(std::make_shared<Route>(route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
             }

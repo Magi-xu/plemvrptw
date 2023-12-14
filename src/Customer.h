@@ -5,8 +5,6 @@
 #ifndef PLEMVRPTW_CUSTOMER_H
 #define PLEMVRPTW_CUSTOMER_H
 
-#include <memory>
-
 namespace vrptw {
 
     class Customer {

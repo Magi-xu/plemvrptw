@@ -29,7 +29,7 @@ int main() {
     constexpr  double delay_time_allow = 0;
     constexpr  size_t population_size = 200;
     constexpr  int iterations = 400;
-    constexpr double k = sqrt(3 * population_size);
+    const double k = sqrt(3 * population_size);
 
     const auto problem = initProblem(data_name, vehicle_speed, delay_time_allow);
     const auto ea = initModel(problem, population_size, iterations);
