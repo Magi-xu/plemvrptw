@@ -6,6 +6,7 @@
 #define PLEMVRPTW_SOLUTION_H
 
 #include <vector>
+#include <memory>
 
 #include "Route.h"
 

@@ -34,7 +34,6 @@ namespace vrptw {
             else if (i < 3 * population_size / 4) pfih_distance_random_init();
             else pfih_time_random_init();
         }
-        crowdingDistanceMatrix = std::vector<std::vector<double>> (population.size(), std::vector<double> (population.size()));
     }
 
     void EA::normal_random_init() {
@@ -267,6 +266,58 @@ namespace vrptw {
     void EA::cullPopulation() {
         const std::vector<Solution::ptr> new_population(population.begin(), population.begin() + static_cast<std::ptrdiff_t>(population_size));
         population = new_population;
+    }
+
+    void EA::encode() {
+        for (size_t i = 0; i < population.size(); ++i) {
+            std::vector<int> code(problem->getCustomerNumber());
+            size_t index = 0;
+            for (const auto& route : population[i]->getRoutes()) {
+                for (const auto& customer : route->getCustomers()) {
+                    if (customer->getId() != 0) code[index++] = customer->getId();
+                }
+            }
+            population_codes[i] = code;
+        }
+    }
+
+    Solution::ptr EA::decode(const std::vector<int>& code) const {
+        std::vector<std::vector<Customer::ptr>> routes;
+        routes.emplace_back(2, problem->getDepot());
+        size_t i = 0;
+        while (i < code.size()) {
+            const size_t index = routes.size() - 1;
+            routes[index].insert(routes[index].end() - 1, problem->getCustomerById(code[i]));
+            if (Route::ptr temp_route(new Route(routes[index], problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                !constraints(temp_route, problem)) {
+                routes[index].erase(routes[index].end() - 2);
+                routes.emplace_back(2, problem->getDepot());
+                routes.back().insert(routes.back().end() - 1, problem->getCustomerById(code[i]));
+            }
+            ++i;
+        }
+        std::vector<Route::ptr> r;
+        r.reserve(routes.size());
+        for (auto& route : routes) {
+            r.push_back(std::make_shared<Route>(route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+        }
+        return std::make_shared<Solution>(r);
+    }
+
+    void EA::printBest() const {
+        std::cout << "vehicle_number:" << population[0]->getVehicleNumber() << " total_distance:" << population[0]->getTotalDistance() << std::endl;
+        for (const auto& route : population[0]->getRoutes()) {
+            const auto& customers = route->getCustomers();
+            for (auto it = customers.begin(); it != customers.end(); ++it) {
+                std::cout << (*it)->getId();
+                if (it + 1 != customers.end()) std::cout << "-->";
+            }
+            std::cout << std::endl;
+        }
+        for (const auto& x : population_codes[0]) {
+            std::cout << x << ' ';
+        }
+        std::cout << std::endl;
     }
 
 } // vrptw

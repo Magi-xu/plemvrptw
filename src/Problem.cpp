@@ -38,7 +38,7 @@ namespace vrptw {
         timeMatrix = std::vector<std::vector<double>> (customers.size(), std::vector<double> (customers.size()));
     }
 
-    void Problem::setDistanceMatrix() {
+    void Problem::calDistanceMatrix() {
         if (customers.empty()) return;
         for (int i = 0; i < customers.size(); ++i) {
             for (int j = 0; j < customers.size(); ++j) {
@@ -49,7 +49,7 @@ namespace vrptw {
 
     }
 
-    void Problem::setTimeMatrix() {
+    void Problem::calTimeMatrix() {
         for (int i = 0; i < customers.size(); ++i) {
             for (int j = 0; j < customers.size(); ++j) {
                 timeMatrix[i][j] = distanceMatrix[i][j] / vehicleSpeed;

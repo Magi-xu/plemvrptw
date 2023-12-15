@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "Customer.h"
 
@@ -31,9 +32,9 @@ namespace vrptw {
         void setMaxReturnTime(const double& time) { maxReturnTime = time;}
         [[nodiscard]] const double& getMaxReturnTime() const { return maxReturnTime;}
 
-        void setDistanceMatrix();
+        void calDistanceMatrix();
         [[nodiscard]] const std::vector<std::vector<double>>& getDistanceMatrix() const { return distanceMatrix;}
-        void setTimeMatrix();
+        void calTimeMatrix();
         [[nodiscard]] const std::vector<std::vector<double>>& getTimeMatrix() const { return timeMatrix;}
     private:
         std::string name;
