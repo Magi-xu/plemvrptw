@@ -22,13 +22,13 @@ namespace vrptw {
             population_size = size;
             crowdingDistanceMatrix = std::vector<std::vector<double>> (size, std::vector<double> (size));
             population_codes = std::vector<std::vector<int>> (size, std::vector<int> (problem->getCustomerNumber()));
-            population_scores = std::vector<std::vector<double>> (size, std::vector<double> (2));
+            population_features = std::vector<std::vector<double>> (size, std::vector<double> (2));
         }
         void setIterations(const int& iters) { iterations = iters;}
 
         [[nodiscard]] const std::vector<Solution::ptr>& getPopulation() const { return population;}
         [[nodiscard]] const std::vector<std::vector<int>>& getCodes() const { return population_codes;}
-        [[nodiscard]] const std::vector<std::vector<double>>& getScores() const { return population_scores;}
+        [[nodiscard]] const std::vector<std::vector<double>>& getFeatures() const { return population_features;}
 
         [[nodiscard]] bool checkUniqueness(const Solution::ptr& s) ;
 
@@ -38,6 +38,7 @@ namespace vrptw {
         void calR_fitness() const;
         void calCrowdingDistance();
         void calF_fitness(const double& k) const;
+        void calFeature();
 
         void sortPopulation();
         void cullPopulation();
@@ -54,7 +55,7 @@ namespace vrptw {
 
         std::vector<std::vector<double>> crowdingDistanceMatrix;
         std::vector<std::vector<int>> population_codes;
-        std::vector<std::vector<double>> population_scores;
+        std::vector<std::vector<double>> population_features;
 
         void normal_random_init();
         void pfih_distance_random_init();

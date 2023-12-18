@@ -257,6 +257,28 @@ namespace vrptw {
         }
     }
 
+    void EA::calFeature() {
+        std::vector<Solution::ptr> p1 = population;
+        std::vector<Solution::ptr> p2 = population;
+        std::ranges::sort(p1.begin(), p1.end(), [&](const Solution::ptr&a, const Solution::ptr& b) {
+            return a->getVehicleNumber() < b->getVehicleNumber();
+        });
+        std::ranges::sort(p2.begin(), p2.end(), [&](const Solution::ptr&a, const Solution::ptr& b) {
+            return a->getTotalDistance() < b->getTotalDistance();
+        });
+        double score1 = 1, score2 = 1;
+        for (const auto& s : p1) {
+            const auto index = std::ranges::distance(population.begin(), std::ranges::find(population, s));
+            population_features[index][0] = score1;
+            score1 -= 1 / static_cast<double>(population_size);
+        }
+        for (const auto& s : p2) {
+            const auto index = std::ranges::distance(population.begin(), std::ranges::find(population, s));
+            population_features[index][1] = score2;
+            score2 -= 1 / static_cast<double>(population_size);
+        }
+    }
+
     void EA::sortPopulation() {
         std::ranges::sort(population.begin(), population.end(), [&](const Solution::ptr& a, const Solution::ptr& b) {
             return a->getF_fitness() < b->getF_fitness();
@@ -305,19 +327,7 @@ namespace vrptw {
     }
 
     void EA::printBest() const {
-        std::cout << "vehicle_number:" << population[0]->getVehicleNumber() << " total_distance:" << population[0]->getTotalDistance() << std::endl;
-        for (const auto& route : population[0]->getRoutes()) {
-            const auto& customers = route->getCustomers();
-            for (auto it = customers.begin(); it != customers.end(); ++it) {
-                std::cout << (*it)->getId();
-                if (it + 1 != customers.end()) std::cout << "-->";
-            }
-            std::cout << std::endl;
-        }
-        for (const auto& x : population_codes[0]) {
-            std::cout << x << ' ';
-        }
-        std::cout << std::endl;
+        printSolution(population[0]);
     }
 
 } // vrptw

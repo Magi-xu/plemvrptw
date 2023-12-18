@@ -44,6 +44,59 @@ namespace vrptw {
         return ea;
     }
 
+    // inline MLP::ptr initMLP(const int64_t& input_size, const int64_t& hidden_size, const int64_t& output_size) {
+    //     const auto model = std::make_shared<MLP>(input_size, hidden_size, output_size);
+    //     return model;
+    // }
+    //
+    // inline std::tuple<torch::Tensor, torch::Tensor> toTensor(const std::vector<std::vector<int>>& population_codes, const std::vector<std::vector<double>>& population_features) {
+    //     torch::Tensor ts_population_codes = torch::from_blob(population_codes.data(), {
+    //         static_cast<long>(population_codes.size()), static_cast<long>(population_codes[0].size())
+    //     }, torch::kInt);
+    //     torch::Tensor ts_population_features = torch::from_blob(population_features.data(), {
+    //         static_cast<long>(population_features.size()), static_cast<long>(population_features[0].size())
+    //     }, torch::kDouble);
+    //     return {ts_population_codes, ts_population_features};
+    // }
+    //
+    // using OptimizerPtr = std::shared_ptr<torch::optim::Optimizer>;
+    // using CriterionPtr = std::shared_ptr<torch::nn::MSELoss>;
+    //
+    // inline OptimizerPtr defOptimizer(MLP::ptr& model, const double& learning_rate) {
+    //     return std::make_shared<torch::optim::Adam>(model->parameters(), torch::optim::AdamOptions(learning_rate));
+    // }
+    //
+    // inline CriterionPtr defCriterion() {
+    //     return std::make_shared<torch::nn::MSELoss>();
+    // }
+    //
+    // inline void trainModel(MLP::ptr& model, torch::Tensor& ts_population_codes, torch::Tensor& ts_population_features, const int& epochs, OptimizerPtr& optimizer, CriterionPtr& criterion) {
+    //     for (int epoch = 0; epoch < epochs; ++epoch) {
+    //         torch::Tensor outputs = model->forward(ts_population_codes);
+    //         torch::Tensor loss = (*criterion)(outputs, ts_population_features);
+    //         optimizer->zero_grad();
+    //         loss.backward();
+    //         optimizer->step();
+    //     }
+    // }
+    //
+    // inline torch::Tensor predict(MLP::ptr& model, torch::Tensor& ts_population_codes) {
+    //     return model->forward(ts_population_codes);
+    // }
+    //
+    // inline std::tuple<std::vector<int>, std::vector<int>> toVector(torch::Tensor& predicted_outputs, const double& p) {
+    //     auto size = predicted_outputs.sizes();
+    //     auto data_accessor = predicted_outputs.accessor<double, 2>();
+    //     std::vector<int>p1, p2;
+    //     for (int i = 0; i < size[0]; ++i) {
+    //         for (int j = 0; j < size[1]; ++j) {
+    //             if (j == 0) if (data_accessor[i][j] >= p) p1.push_back(i);
+    //             if (j == 1) if (data_accessor[i][j] >= p) p2.push_back(i);
+    //         }
+    //     }
+    //     return {p1, p2};
+    // }
+
     inline void printSolution(const Solution::ptr& solution) {
         std::cout << "vehicle_number:" << solution->getVehicleNumber() << " total_distance:" << solution->getTotalDistance() << std::endl;
         for (const auto& route : solution->getRoutes()) {

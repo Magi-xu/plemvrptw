@@ -11,6 +11,8 @@
 namespace vrptw{
 
     struct MLP : torch::nn::Module {
+        typedef std::shared_ptr<MLP> ptr;
+
         MLP(int64_t input_size, int64_t hidden_size, int64_t output_size) {
             fc1 = register_module("fc1", torch::nn::Linear(input_size, hidden_size));
             fc2 = register_module("fc2", torch::nn::Linear(hidden_size, hidden_size));
@@ -29,6 +31,9 @@ namespace vrptw{
         torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr};
         torch::nn::ReLU relu;
         torch::nn::Sigmoid sigmoid;
+
+        torch::nn::MSELoss criterion;
+        torch::optim::Adam optimizer(model->parameters(), torch::optim::AdamOptions(learning_rate));
     };
 
 } //vrptw
