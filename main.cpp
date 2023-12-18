@@ -61,7 +61,7 @@ int main() {
     // auto [ts_population_codes, ts_population_features] = toTensor(ea->getCodes(), ea->getFeatures());       //  预处理
     // trainModel(mlp, ts_population_codes, ts_population_features, epochs, optimizer, criterion);             //  训练
     // auto ts_predicted_outputs = predict(mlp, ts_population_codes);                                          //  预测
-    // auto [select_index1, select_index2] = toVector(ts_population_codes, p);                                 //  转码
+    // auto [select_index1, select_index2] = toVector(ts_population_codes, p);                                 //  选择
 
 
 
