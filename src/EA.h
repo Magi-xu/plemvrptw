@@ -20,8 +20,6 @@ namespace vrptw {
 
         void setPopulation_size(const size_t& size) {
             population_size = size;
-            crowdingDistanceMatrix = std::vector<std::vector<double>> (size, std::vector<double> (size));
-            population_codes = std::vector<std::vector<int>> (size, std::vector<int> (problem->getCustomerNumber()));
             population_features = std::vector<std::vector<double>> (size, std::vector<double> (2));
         }
         void setIterations(const int& iters) { iterations = iters;}
@@ -46,6 +44,8 @@ namespace vrptw {
         void encode();
         [[nodiscard]] Solution::ptr decode(const std::vector<int>& code) const;
 
+        void generate(const std::vector<size_t>& i1, const std::vector<size_t>& i2);
+
         void printBest() const;
     private:
         Problem::ptr problem{};
@@ -60,6 +60,8 @@ namespace vrptw {
         void normal_random_init();
         void pfih_distance_random_init();
         void pfih_time_random_init();
+        void cross1(const std::vector<std::vector<std::vector<Customer::ptr>>>& s);
+        void getNewPopulation(const std::vector<Solution::ptr>& p, const int8_t& type = 0);
     };
 
 } // vrptw

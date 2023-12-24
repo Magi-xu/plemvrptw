@@ -8,6 +8,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <filesystem>
+#include <ctime>
 
 namespace vrptw {
 
@@ -87,7 +90,7 @@ namespace vrptw {
     // inline std::tuple<std::vector<int>, std::vector<int>> toVector(torch::Tensor& predicted_outputs, const double& p) {
     //     auto size = predicted_outputs.sizes();
     //     auto data_accessor = predicted_outputs.accessor<double, 2>();
-    //     std::vector<int>p1, p2;
+    //     std::vector<size_t>p1, p2;
     //     for (int i = 0; i < size[0]; ++i) {
     //         for (int j = 0; j < size[1]; ++j) {
     //             if (j == 0) if (data_accessor[i][j] >= p) p1.push_back(i);
@@ -97,16 +100,51 @@ namespace vrptw {
     //     return {p1, p2};
     // }
 
+    inline void printRoute(const Route::ptr& route) {
+        std::cout << "Route:\t ";
+        const auto& customers = route->getCustomers();
+        for (auto it = customers.begin(); it != customers.end(); ++it) {
+            std::cout << (*it)->getId();
+            if (it + 1 != customers.end()) std::cout << "\t-->\t";
+        }
+        std::cout << std::endl;
+    }
+
+    inline void printRoute(const std::vector<Customer::ptr>& route) {
+        std::cout << "Route:\t ";
+        const auto& customers = route;
+        for (auto it = customers.begin(); it != customers.end(); ++it) {
+            std::cout << (*it)->getId();
+            if (it + 1 != customers.end()) std::cout << "\t-->\t";
+        }
+        std::cout << std::endl;
+    }
+
     inline void printSolution(const Solution::ptr& solution) {
-        std::cout << "vehicle_number:" << solution->getVehicleNumber() << " total_distance:" << solution->getTotalDistance() << std::endl;
+        std::cout << "vehicle_number: " << solution->getVehicleNumber() << "\ttotal_distance: " << solution->getTotalDistance() << std::endl;
         for (const auto& route : solution->getRoutes()) {
+            std::cout << "Route:\t ";
             const auto& customers = route->getCustomers();
             for (auto it = customers.begin(); it != customers.end(); ++it) {
                 std::cout << (*it)->getId();
-                if (it + 1 != customers.end()) std::cout << "-->";
+                if (it + 1 != customers.end()) std::cout << "\t-->\t";
             }
             std::cout << std::endl;
         }
+    }
+
+    inline void writeToFile(const Solution::ptr& solution, const std::string& data_name) {
+        const std::string folder = "../results/solomon_100/" + data_name + "/";
+        const std::string filename = folder + data_name + ".txt";
+        if (!std::filesystem::exists(folder)) std::filesystem::create_directories(folder);
+        const std::ofstream file(filename, std::ios::app);  // 使用 append 模式打开文件
+        std::streambuf* original_cout = std::cout.rdbuf();
+        std::cout.rdbuf(file.rdbuf());  // 重定向标准输出到文件
+        const std::time_t current_time = std::time(nullptr);
+        std::cout << data_name << ":\t" << std::put_time(std::localtime(&current_time), "%Y-%m-%d %H:%M:%S") << std::endl;
+        printSolution(solution);
+        std::cout << std::endl;
+        std::cout.rdbuf(original_cout);  // 恢复标准输出
     }
 
 } //vrptw

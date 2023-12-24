@@ -1,3 +1,5 @@
+#include <__ranges/iota_view.h>
+
 #include "src/plemvrptw.h"
 
 using namespace vrptw;
@@ -19,10 +21,8 @@ constexpr int epochs = 100;                         //  epochs
 constexpr double p = 0.7;                           //  p
 /*  参数  */
 /**********************************************************************************************************************/
-
-int main() {
-    /******************************************************************************************************************/
-    /*  算法  */
+/*  算法  */
+void run() {
     const auto problem = initProblem(
         data_name,
         vehicle_speed,
@@ -48,64 +48,40 @@ int main() {
     // auto criterion = defCriterion();                         //  损失函数
 
     ea->populationInitialize();     //  种群初始化
-    ea->calStrength();              //  计算强度值
-    ea->calR_fitness();             //  计算原始适应度值
-    ea->calCrowdingDistance();      //  计算拥挤度距离
-    ea->calF_fitness(k);            //  计算拥挤适应度值
-    ea->sortPopulation();           //  种群排序
-    ea->printBest();                //  打印最优解
-    ea->cullPopulation();           //  淘汰多余个体
-    ea->encode();                   //  编码
-    ea->calFeature();               //  计算特征
 
-    // auto [ts_population_codes, ts_population_features] = toTensor(ea->getCodes(), ea->getFeatures());       //  预处理
-    // trainModel(mlp, ts_population_codes, ts_population_features, epochs, optimizer, criterion);             //  训练
-    // auto ts_predicted_outputs = predict(mlp, ts_population_codes);                                          //  预测
-    // auto [select_index1, select_index2] = toVector(ts_population_codes, p);                                 //  选择
+    for (int i = 0; i < iterations; ++i) {
+        ea->calStrength();              //  计算强度值
+        ea->calR_fitness();             //  计算原始适应度值
+        ea->calCrowdingDistance();      //  计算拥挤度距离
+        ea->calF_fitness(k);            //  计算拥挤适应度值
+        ea->sortPopulation();           //  种群排序
+        ea->printBest();                //  打印最优解
+        // writeToFile(ea->getPopulation()[0], data_name);
+        ea->cullPopulation();           //  淘汰多余个体
+        ea->encode();                   //  编码
+        ea->calFeature();               //  计算特征
 
+        // auto [ts_population_codes, ts_population_features] = toTensor(ea->getCodes(), ea->getFeatures());       //  预处理
+        // trainModel(mlp, ts_population_codes, ts_population_features, epochs, optimizer, criterion);             //  训练
+        // auto ts_predicted_outputs = predict(mlp, ts_population_codes);                                          //  预测
+        // auto [select_index1, select_index2] = toVector(ts_population_codes, p);                                 //  选择
 
+        std::vector<size_t> i1(population_size / 2);
+        std::iota(i1.begin(), i1.end(), 1);
+        const std::vector<size_t> i2{1,2,3};
 
-    /*  算法  */
-    /******************************************************************************************************************/
+        // std::cout << ea->getPopulation().size() << std::endl;
 
+        ea->generate(i1, i2);
 
+        // std::cout << ea->getPopulation().size() << std::endl;
+    }
+}
+/**********************************************************************************************************************/
 
-    // for (const auto& solution : ea->getPopulation())
-    //     cout << solution->getFitness()[0] << "   " << solution->getFitness()[1] <<endl;
-    //
-    // cout << ea->getPopulation().size() << endl;
-    // cout << ea->getPopulation()[0]->getVehicleNumber() << "  " << ea->getPopulation()[0]->getTotalDistance() << endl;
-    // for (const auto& route : ea->getPopulation()[0]->getRoutes()) {
-    //     const auto& customers = route->getCustomers();
-    //     for (auto it = customers.begin(); it != customers.end(); ++it) {
-    //         cout << (*it)->getId();
-    //         if (it + 1 != customers.end()) cout << "-->";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << endl;
-    // cout << ea->getPopulation()[100]->getVehicleNumber() << "  " << ea->getPopulation()[100]->getTotalDistance() << endl;
-    // for (const auto& route : ea->getPopulation()[100]->getRoutes()) {
-    //     const auto& customers = route->getCustomers();
-    //     for (auto it = customers.begin(); it != customers.end(); ++it) {
-    //         cout << (*it)->getId();
-    //         if (it + 1 != customers.end()) cout << "-->";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << endl;
-    // cout << ea->getPopulation()[150]->getVehicleNumber() << "  " << ea->getPopulation()[150]->getTotalDistance() << endl;
-    // for (const auto& route : ea->getPopulation()[150]->getRoutes()) {
-    //     const auto& customers = route->getCustomers();
-    //     for (auto it = customers.begin(); it != customers.end(); ++it) {
-    //         cout << (*it)->getId();
-    //         if (it + 1 != customers.end()) cout << "-->";
-    //     }
-    //     cout << endl;
-    // }
+int main() {
 
-
-
+    run();
 
     return 0;
 }
