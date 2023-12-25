@@ -13,8 +13,8 @@ namespace vrptw {
         delayTimeMatrix = std::vector<double> (customers.size());
         for (int i = 1; i < customers.size(); ++i) {
             load += customers[i]->getDemand();
-            travleDistance += distanceMatrix[i - 1][i];
-            travleTime += timeMatrix[i - 1][i];
+            travleDistance += distanceMatrix[customers[i - 1]->getId()][customers[i]->getId()];
+            travleTime += timeMatrix[customers[i - 1]->getId()][customers[i]->getId()];
             if (travleTime < customers[i]->getReadyTime()) {
                 waitTime += customers[i]->getReadyTime() - travleTime;
                 travleTime = customers[i]->getReadyTime();

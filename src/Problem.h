@@ -22,7 +22,7 @@ namespace vrptw {
         [[nodiscard]] const int& getVehicleNumber() const { return vehicleNumber;}
         [[nodiscard]] const int& getCapacity() const { return capacity;}
         [[nodiscard]] std::vector<Customer::ptr> getCustomers() const { return customers;}
-        [[nodiscard]] size_t getCustomerNumber() const { return customers.size() - 1;}
+        [[nodiscard]] int getCustomerNumber() const { return static_cast<int>(customers.size() - 1);}
         [[nodiscard]] Customer::ptr getCustomerById(const int& id) const { return customers[id];}
         [[nodiscard]] Customer::ptr getDepot() const { return customers[0];}
 

@@ -46,7 +46,7 @@ namespace vrptw {
 
         void generate(const std::vector<size_t>& i1, const std::vector<size_t>& i2);
 
-        void printBest() const;
+        void printBest(const int& i, const bool& detal) const;
     private:
         Problem::ptr problem{};
         std::vector<Solution::ptr> population{};
@@ -60,8 +60,11 @@ namespace vrptw {
         void normal_random_init();
         void pfih_distance_random_init();
         void pfih_time_random_init();
-        void cross1(const std::vector<std::vector<std::vector<Customer::ptr>>>& s);
-        void getNewPopulation(const std::vector<Solution::ptr>& p, const int8_t& type = 0);
+        void cross1(const std::vector<std::vector<std::vector<Customer::ptr>>>& solutions);
+        void cross2(const std::vector<std::vector<std::vector<Customer::ptr>>>& solutions);
+        void mutation1(const std::vector<std::vector<std::vector<Customer::ptr>>>& solutions);
+        void mutation2(const std::vector<std::vector<std::vector<Customer::ptr>>>& solutions);
+        void getNewPopulation(const std::vector<Solution::ptr>& selected_population, const int8_t& type = 0);
     };
 
 } // vrptw

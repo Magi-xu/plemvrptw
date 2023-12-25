@@ -8,8 +8,10 @@
 #include <numeric>
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <random>
 #include <set>
+#include <unordered_set>
 
 #include "util.h"
 
@@ -195,15 +197,17 @@ namespace vrptw {
         }
     }
 
+    // 从两个父代中选k条最长的路线作为子代，再尝试插入剩下的客户
     void EA::cross1(const std::vector<std::vector<std::vector<Customer::ptr>>>& solutions) {
-        for (auto it1 = solutions.begin(), it2 = it1 + 1;
-            it1 != solutions.end() && it2 != solutions.end();
-            it1 += 2, it2 += 2) {
+        for (auto it1 = solutions.begin(); it1 != solutions.end(); std::ranges::advance(it1, 2)) {
+            auto it2 = std::ranges::next(it1);
+            if (it2 == solutions.end()) break;
             std::vector<std::vector<std::vector<Customer::ptr>>> parents {(*it1), (*it2)};
             const auto k = std::ranges::min(parents[0].size(), parents[1].size()) - 1;
             std::vector<std::vector<Customer::ptr>> child_routes;
             child_routes.reserve(k);
             for (auto i = 0; i < k; ++i) {
+                if (parents[0].empty() && parents[1].empty()) break;
                 auto f_route = &parents[0][0];
                 int parent_index = 0;
                 int route_index = 0;
@@ -225,6 +229,7 @@ namespace vrptw {
                         route_index = l;
                     }
                 }
+
                 child_routes.push_back(*f_route);
                 parents[parent_index].erase(parents[parent_index].begin() + route_index);
                 parent_index  = 1 - parent_index;
@@ -242,15 +247,23 @@ namespace vrptw {
                     }
                 }
             }
-            std::set<Customer::ptr> unvisited;
+
+            std::set<Customer::ptr> s_unvisited;
             for (const auto& parent : parents) {
                 for (const auto& route : parent) {
                     for (const auto& x : route) {
-                        if (x->getId() != 0) unvisited.insert(x);
+                        if (x->getId() != 0) s_unvisited.insert(x);
                     }
                 }
             }
-            for (const auto& x : unvisited) {
+            std::vector<Customer::ptr> v_unvisited(s_unvisited.begin(), s_unvisited.end());
+            std::vector<int> index(v_unvisited.size());
+            std::iota(index.begin(), index.end(), 0);
+            const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::ranges::shuffle(index.begin(), index.end(), std::default_random_engine(seed));
+
+            for (const auto& i : index) {
+                const auto& x = v_unvisited[i];
                 bool sf = false;
                 for (auto& child_route : child_routes) {
                     for (int j = 1; j < child_route.size() - 1; ++j) {
@@ -259,7 +272,8 @@ namespace vrptw {
                             constraints(new_temp_route, problem)) {
                             sf = true;
                             break;
-                        } else child_route.erase(child_route.begin() + j);
+                        }
+                        child_route.erase(child_route.begin() + j);
                     }
                     if (sf) break;
                 }
@@ -268,6 +282,7 @@ namespace vrptw {
                     child_routes.back().insert(child_routes.back().end() - 1, x);
                 }
             }
+
             std::vector<Route::ptr> r;
             r.reserve(child_routes.size());
             for (const auto& route : child_routes) {
@@ -279,18 +294,268 @@ namespace vrptw {
         }
     }
 
-    void EA::getNewPopulation(const std::vector<Solution::ptr>& population, const int8_t& type) {
+    // 从两个父代中选k条服务效率最大的路线作为子代，再尝试插入剩下的客户
+    void EA::cross2(const std::vector<std::vector<std::vector<Customer::ptr>>>& solutions) {
+        for (auto it1 = solutions.begin(); it1 != solutions.end(); std::ranges::advance(it1, 2)) {
+            auto it2 = std::ranges::next(it1);
+            if (it2 == solutions.end()) break;
+            std::vector<std::vector<std::vector<Customer::ptr>>> parents {(*it1), (*it2)};
+            const auto k = std::ranges::min(parents[0].size(), parents[1].size());
+            std::vector<std::vector<Customer::ptr>> child_routes;
+            child_routes.reserve(k);
+            for (auto i = 0; i < k; ++i) {
+                if (parents[0].empty() && parents[1].empty()) break;
+                auto f_route = &parents[0][0];
+                int parent_index = 0;
+                int route_index = 0;
+                int l = -1;
+                for (auto& x : parents[0]) {
+                    ++l;
+                    const Route::ptr new_f_route(new Route(*f_route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                    if (const Route::ptr new_temp_route(new Route(x, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                        new_temp_route->getTravleDistance() / new_temp_route->getCustomerNumber() < new_f_route->getTravleDistance() / new_f_route->getCustomerNumber()) {
+                        f_route = &x;
+                        parent_index = 0;
+                        route_index = l;
+                    }
+                }
+                l = -1;
+                for (auto& x : parents[1]) {
+                    ++l;
+                    const Route::ptr new_f_route(new Route(*f_route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                    if (const Route::ptr new_temp_route(new Route(x, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                        new_temp_route->getTravleDistance() / new_temp_route->getCustomerNumber() < new_f_route->getTravleDistance() / new_f_route->getCustomerNumber()) {
+                        f_route = &x;
+                        parent_index = 1;
+                        route_index = l;
+                    }
+                }
+
+                child_routes.push_back(*f_route);
+                parents[parent_index].erase(parents[parent_index].begin() + route_index);
+                parent_index  = 1 - parent_index;
+                for (const auto& x : child_routes.back()) {
+                    if (x->getId() == 0) continue;
+                    for (auto route = parents[parent_index].begin();
+                         route != parents[parent_index].end();
+                         ++route) {
+                        if (const auto y = std::ranges::find(*route, x);
+                            y != route->end()) {
+                            route->erase(y);
+                            if (route->size() == 2) parents[parent_index].erase(route);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            std::set<Customer::ptr> s_unvisited;
+            for (const auto& parent : parents) {
+                for (const auto& route : parent) {
+                    for (const auto& x : route) {
+                        if (x->getId() != 0) s_unvisited.insert(x);
+                    }
+                }
+            }
+            std::vector<Customer::ptr> v_unvisited(s_unvisited.begin(), s_unvisited.end());
+            std::vector<int> index(v_unvisited.size());
+            std::iota(index.begin(), index.end(), 0);
+            const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::ranges::shuffle(index.begin(), index.end(), std::default_random_engine(seed));
+
+            for (const auto& i : index) {
+                const auto& x = v_unvisited[i];
+                bool sf = false;
+                double min_distance_inc = std::numeric_limits<double>::max();
+                int route_index = 0;
+                int pos_index = 1;
+                int now_route_index = -1;
+                for (auto& child_route : child_routes) {
+                    ++now_route_index;
+                    int now_pos_index = 0;
+                    const Route::ptr old_temp_route(new Route(child_route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                    for (int j = 1; j < child_route.size() - 1; ++j) {
+                        ++now_pos_index;
+                        child_route.insert(child_route.begin() + j, x);
+                        if (const Route::ptr new_temp_route(new Route(child_route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                            constraints(new_temp_route, problem)) {
+                            if (const double distance_inc = new_temp_route->getTravleDistance() - old_temp_route->getTravleDistance();
+                                distance_inc < min_distance_inc) {
+                                sf = true;
+                                min_distance_inc = distance_inc;
+                                route_index = now_route_index;
+                                pos_index = now_pos_index;
+                            }
+                        }
+                        child_route.erase(child_route.begin() + j);
+                    }
+                }
+                if (sf) {
+                    child_routes[route_index].insert(child_routes[route_index].begin() + pos_index, x);
+                } else {
+                    child_routes.emplace_back(2, problem->getDepot());
+                    child_routes.back().insert(child_routes.back().end() - 1, x);
+                }
+            }
+
+            std::vector<Route::ptr> r;
+            r.reserve(child_routes.size());
+            for (const auto& route : child_routes) {
+                r.push_back(std::make_shared<Route>(route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+            }
+            if (const auto s = std::make_shared<Solution>(r); checkUniqueness(s)) {
+                population.push_back(s);
+            }
+        }
+    }
+
+    // 拆掉一个最短的路线，重新尝试插入
+    void EA::mutation1(const std::vector<std::vector<std::vector<Customer::ptr>>>& solutions) {
+        for (auto child_routes : solutions) {
+            auto f_route = &child_routes[0];
+            int route_index = 0;
+            int l = -1;
+            for (auto& x : child_routes) {
+                ++l;
+                if (x.size() < f_route->size()) {
+                    f_route = &x;
+                    route_index = l;
+                }
+            }
+
+            std::vector<Customer::ptr> v_unvisited(f_route->begin() + 1, f_route->end() - 1);
+            child_routes.erase(child_routes.begin() + route_index);
+            std::vector<int> index(v_unvisited.size());
+            std::iota(index.begin(), index.end(), 0);
+            const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::ranges::shuffle(index.begin(), index.end(), std::default_random_engine(seed));
+
+            bool sf = false;
+            for (const auto& i : index) {
+                const auto& x = v_unvisited[i];
+                sf = false;
+                for (auto& child_route : child_routes) {
+                    for (int j = 1; j < child_route.size() - 1; ++j) {
+                        child_route.insert(child_route.begin() + j, x);
+                        if (const Route::ptr new_temp_route(new Route(child_route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                            constraints(new_temp_route, problem)) {
+                            sf = true;
+                            break;
+                        }
+                        child_route.erase(child_route.begin() + j);
+                    }
+                    if (sf) break;
+                }
+                if (!sf) {
+                    break;
+                }
+            }
+            if (!sf) continue;
+
+            std::vector<Route::ptr> r;
+            r.reserve(child_routes.size());
+            for (const auto& route : child_routes) {
+                r.push_back(std::make_shared<Route>(route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+            }
+            if (const auto s = std::make_shared<Solution>(r); checkUniqueness(s)) {
+                population.push_back(s);
+            }
+        }
+    }
+
+    // 随机移出客户并重新插入
+    void EA::mutation2(const std::vector<std::vector<std::vector<Customer::ptr>>>& solutions) {
+        std::random_device rd;
+        std::default_random_engine gen(rd());
+        for (auto child_routes : solutions) {
+            std::uniform_int_distribution<> dis_x(0, static_cast<int>(child_routes.size()) - 1);
+            const int r_index = dis_x(gen);
+            std::uniform_int_distribution<> dis_y(0, static_cast<int>(child_routes[r_index].size()) - 3);
+            const int k = dis_y(gen);
+            if (k == 0) continue;
+            std::unordered_set<int> s_customer_index;
+            std::uniform_int_distribution<> dis_unique(1, static_cast<int>(child_routes[r_index].size()) - 2);
+            while (s_customer_index.size() < k) {
+                int num = dis_unique(gen);
+                s_customer_index.insert(num);
+            }
+
+            std::vector<Customer::ptr> v_unvisited(k);
+            int c_index = 0;
+            for (const auto& x : s_customer_index) {
+                v_unvisited[c_index++] = child_routes[r_index][x];
+            }
+            for (const auto& x : v_unvisited) {
+                child_routes[r_index].erase(std::ranges::find(child_routes[r_index], x));
+            }
+            if (child_routes[r_index].size() == 2) child_routes.erase(child_routes.begin() + r_index);
+            std::vector<int> index(v_unvisited.size());
+            std::iota(index.begin(), index.end(), 0);
+            const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::ranges::shuffle(index.begin(), index.end(), std::default_random_engine(seed));
+
+            for (const auto& i : index) {
+                const auto& x = v_unvisited[i];
+                bool sf = false;
+                double min_distance_inc = std::numeric_limits<double>::max();
+                int route_index = 0;
+                int pos_index = 1;
+                int now_route_index = -1;
+                for (auto& child_route : child_routes) {
+                    ++now_route_index;
+                    int now_pos_index = 0;
+                    const Route::ptr old_temp_route(new Route(child_route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                    for (int j = 1; j < child_route.size() - 1; ++j) {
+                        ++now_pos_index;
+                        child_route.insert(child_route.begin() + j, x);
+                        if (const Route::ptr new_temp_route(new Route(child_route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+                            constraints(new_temp_route, problem)) {
+                            if (const double distance_inc = new_temp_route->getTravleDistance() - old_temp_route->getTravleDistance();
+                                distance_inc < min_distance_inc) {
+                                sf = true;
+                                min_distance_inc = distance_inc;
+                                route_index = now_route_index;
+                                pos_index = now_pos_index;
+                                }
+                        }
+                        child_route.erase(child_route.begin() + j);
+                    }
+                }
+                if (sf) {
+                    child_routes[route_index].insert(child_routes[route_index].begin() + pos_index, x);
+                } else {
+                    child_routes.emplace_back(2, problem->getDepot());
+                    child_routes.back().insert(child_routes.back().end() - 1, x);
+                }
+            }
+
+            std::vector<Route::ptr> r;
+            r.reserve(child_routes.size());
+            for (const auto& route : child_routes) {
+                r.push_back(std::make_shared<Route>(route, problem->getDistanceMatrix(), problem->getTimeMatrix()));
+            }
+            if (const auto s = std::make_shared<Solution>(r); checkUniqueness(s)) {
+                population.push_back(s);
+            }
+        }
+    }
+
+    void EA::getNewPopulation(const std::vector<Solution::ptr>& selected_population, const int8_t& type) {
         if (type == 0) return;
-        std::vector<std::vector<std::vector<Customer::ptr>>> solutions(population.size());
+        std::vector<std::vector<std::vector<Customer::ptr>>> solutions(selected_population.size());
         size_t i = 0;
         while (i < solutions.size()) {
-            for (const auto& s = population[i]->getRoutes();const auto& r : s) {
+            for (const auto& s = selected_population[i]->getRoutes();
+                 const auto& r : s) {
                 solutions[i].push_back(r->getCustomers());
             }
             ++i;
         }
         if (type == 1) {
             cross1(solutions);
+            cross2(solutions);
+            mutation1(solutions);
+            mutation2(solutions);
         }
         if (type == 2) {
 
@@ -448,8 +713,9 @@ namespace vrptw {
         getNewPopulation(p2, 2);
     }
 
-    void EA::printBest() const {
-        printSolution(population[0]);
+    void EA::printBest(const int& i, const bool& detal) const {
+        std::cout << "[" << i << "] \t";
+        printSolution(population[0], detal);
     }
 
 } // vrptw

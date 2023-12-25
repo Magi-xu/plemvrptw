@@ -50,31 +50,28 @@ void run() {
     ea->populationInitialize();     //  种群初始化
 
     for (int i = 0; i < iterations; ++i) {
-        ea->calStrength();              //  计算强度值
-        ea->calR_fitness();             //  计算原始适应度值
-        ea->calCrowdingDistance();      //  计算拥挤度距离
-        ea->calF_fitness(k);            //  计算拥挤适应度值
-        ea->sortPopulation();           //  种群排序
-        ea->printBest();                //  打印最优解
+        ea->calStrength();                          //  计算强度值
+        ea->calR_fitness();                         //  计算原始适应度值
+        ea->calCrowdingDistance();                  //  计算拥挤度距离
+        ea->calF_fitness(k);                        //  计算拥挤适应度值
+        ea->sortPopulation();                       //  种群排序
+        ea->printBest(i + 1, false);           //  打印最优解
         // writeToFile(ea->getPopulation()[0], data_name);
-        ea->cullPopulation();           //  淘汰多余个体
-        ea->encode();                   //  编码
-        ea->calFeature();               //  计算特征
+        ea->cullPopulation();                       //  淘汰多余个体
+        ea->encode();                               //  编码
+        ea->calFeature();                           //  计算特征
 
         // auto [ts_population_codes, ts_population_features] = toTensor(ea->getCodes(), ea->getFeatures());       //  预处理
         // trainModel(mlp, ts_population_codes, ts_population_features, epochs, optimizer, criterion);             //  训练
         // auto ts_predicted_outputs = predict(mlp, ts_population_codes);                                          //  预测
         // auto [select_index1, select_index2] = toVector(ts_population_codes, p);                                 //  选择
 
-        std::vector<size_t> i1(population_size / 2);
-        std::iota(i1.begin(), i1.end(), 1);
+        std::vector<size_t> i1(200);
+        std::iota(i1.begin(), i1.end(), 0);
         const std::vector<size_t> i2{1,2,3};
 
-        // std::cout << ea->getPopulation().size() << std::endl;
 
         ea->generate(i1, i2);
-
-        // std::cout << ea->getPopulation().size() << std::endl;
     }
 }
 /**********************************************************************************************************************/

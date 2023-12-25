@@ -20,6 +20,7 @@ namespace vrptw {
               const std::vector<std::vector<double>>& timeMatrix);
 
         [[nodiscard]] std::vector<Customer::ptr> getCustomers() const { return customers;}
+        [[nodiscard]] int getCustomerNumber() const { return static_cast<int>(customers.size() - 2);}
         [[nodiscard]] const int& getLoad() const { return load;}
         [[nodiscard]] const double& getTravleDistance() const { return travleDistance;}
         [[nodiscard]] const double& getTravleTime() const { return travleTime;}

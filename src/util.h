@@ -120,16 +120,12 @@ namespace vrptw {
         std::cout << std::endl;
     }
 
-    inline void printSolution(const Solution::ptr& solution) {
-        std::cout << "vehicle_number: " << solution->getVehicleNumber() << "\ttotal_distance: " << solution->getTotalDistance() << std::endl;
+    inline void printSolution(const Solution::ptr& solution, const bool& detal=true) {
+        std::cout << "NV: " << solution->getVehicleNumber() << "\t\tTD: " << solution->getTotalDistance() << std::endl;
+        if (!detal) return;
         for (const auto& route : solution->getRoutes()) {
-            std::cout << "Route:\t ";
-            const auto& customers = route->getCustomers();
-            for (auto it = customers.begin(); it != customers.end(); ++it) {
-                std::cout << (*it)->getId();
-                if (it + 1 != customers.end()) std::cout << "\t-->\t";
-            }
-            std::cout << std::endl;
+            printRoute(route);
+
         }
     }
 
