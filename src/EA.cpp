@@ -695,7 +695,7 @@ namespace vrptw {
         return std::make_shared<Solution>(r);
     }
 
-    void EA::generate(const std::vector<size_t>& i1, const std::vector<size_t>& i2) {
+    std::tuple<int, int> EA::generate(const std::vector<size_t>& i1, const std::vector<size_t>& i2) {
         std::vector<Solution::ptr> p1(i1.size());
         std::vector<Solution::ptr> p2(i2.size());
         size_t i = 0;
@@ -709,11 +709,13 @@ namespace vrptw {
             ++i;
         }
         getNewPopulation(p1, 1);
+        int r1 = population.size() - population_size;
         getNewPopulation(p2, 2);
+        int r2 = population.size()  - population_size - r1;
+        return {r1, r2};
     }
 
-    void EA::printBest(const int& i, const bool& detal) const {
-        std::cout << "[" << i << "] \t";
+    void EA::printBest(const bool& detal) const {
         printSolution(population[0], detal);
     }
 

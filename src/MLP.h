@@ -40,7 +40,7 @@ namespace vrptw{
         std::tuple<torch::Tensor, torch::Tensor> toTensor(std::vector<std::vector<double>>& population_codes, std::vector<std::vector<double>>& population_features);
         void defOptimizer(const double& learning_rate);
         void defCriterion();
-        void trainModel(torch::Tensor& ts_population_codes, torch::Tensor& ts_population_features, const int& epochs);
+        double trainModel(torch::Tensor& ts_population_codes, torch::Tensor& ts_population_features, const int& epochs);
         torch::Tensor predict(torch::Tensor& ts_population_codes);
         std::tuple<std::vector<size_t>, std::vector<size_t>> toVector(torch::Tensor& predicted_outputs, const double& p);
     };

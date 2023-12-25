@@ -43,9 +43,9 @@ namespace vrptw {
         void encode();
         [[nodiscard]] Solution::ptr decode(const std::vector<double>& code) const;
 
-        void generate(const std::vector<size_t>& i1, const std::vector<size_t>& i2);
+        std::tuple<int, int> generate(const std::vector<size_t>& i1, const std::vector<size_t>& i2);
 
-        void printBest(const int& i, const bool& detal) const;
+        void printBest(const bool& detal) const;
     private:
         Problem::ptr problem{};
         std::vector<Solution::ptr> population{};

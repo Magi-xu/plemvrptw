@@ -54,29 +54,30 @@ void run() {
         ea->calCrowdingDistance();                  //  计算拥挤度距离
         ea->calF_fitness(k);                        //  计算拥挤适应度值
         ea->sortPopulation();                       //  种群排序
-        ea->printBest(i + 1, false);           	    //  打印最优解
+        // ea->printBest(false);           	        //  打印最优解
         // writeToFile(ea->getPopulation()[0], data_name);
         ea->cullPopulation();                       //  淘汰多余个体
         ea->encode();                               //  编码
         ea->calFeature();                           //  计算特征
 
         auto [ts_population_codes, ts_population_features] = mlp->toTensor(ea->getCodes(), ea->getFeatures());      //  预处理
-        mlp->trainModel(ts_population_codes, ts_population_features, epochs);                                       //  训练
+        auto loss = mlp->trainModel(ts_population_codes, ts_population_features, epochs);                           //  训练
         auto ts_predicted_outputs = mlp->predict(ts_population_codes);                                              //  预测
         auto [select_index1, select_index2] = mlp->toVector(ts_population_codes, p);                                //  选择
         
-        ea->generate(select_index1, select_index2);
-        std::cout << select_index1.size() << " " << select_index2.size() << std::endl;
+        auto [r1, r2] = ea->generate(select_index1, select_index2);
 
-
-        // std::vector<size_t> i1(200);
-        // std::iota(i1.begin(), i1.end(), 0);
-        // const std::vector<size_t> i2{1,2,3};
-        // ea->generate(i1, i2);
-
-        
-
-
+        std::ostringstream output;
+        std::ostringstream select_info;
+        std::ostringstream generate_info;
+        select_info << "{pick: (" << select_index1.size() << "," << select_index2.size() << ")";
+        generate_info << "generate: (" << r1 << "," << r2 << ")} \t" ;
+        output << "[" << i+1 << "] \t"
+               << std::setw(16) << std::left << select_info.str()
+               << "|" 
+               << std::setw(22) << std::right << generate_info.str();
+        std::cout << output.str();
+        ea->printBest(false);
     }
 }
 /**********************************************************************************************************************/

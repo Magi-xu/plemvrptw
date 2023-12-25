@@ -24,14 +24,17 @@ namespace vrptw{
         criterion = std::make_shared<torch::nn::MSELoss>();
     }
     
-    void MLP::trainModel(torch::Tensor& ts_population_codes, torch::Tensor& ts_population_features, const int& epochs) {
+    double MLP::trainModel(torch::Tensor& ts_population_codes, torch::Tensor& ts_population_features, const int& epochs) {
+        double loss_value;
         for (int epoch = 0; epoch < epochs; ++epoch) {
             torch::Tensor outputs = this->forward(ts_population_codes);
             torch::Tensor loss = (*criterion)(outputs, ts_population_features);
             optimizer->zero_grad();
             loss.backward();
             optimizer->step();
+            loss_value = loss.item<double>();
         }
+        return loss_value;
     }
     
     torch::Tensor MLP::predict(torch::Tensor& ts_population_codes) {
