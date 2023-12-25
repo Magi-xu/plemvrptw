@@ -2,8 +2,6 @@
 // Created by Magi Xu on 2023/12/7.
 //
 
-#include "EA.h"
-
 #include <utility>
 #include <numeric>
 #include <algorithm>
@@ -13,6 +11,7 @@
 #include <set>
 #include <unordered_set>
 
+#include "EA.h"
 #include "util.h"
 
 namespace vrptw {
@@ -553,12 +552,11 @@ namespace vrptw {
         }
         if (type == 1) {
             cross1(solutions);
-            cross2(solutions);
             mutation1(solutions);
-            mutation2(solutions);
         }
         if (type == 2) {
-
+            cross2(solutions);
+            mutation2(solutions);
         }
     }
 
@@ -627,6 +625,7 @@ namespace vrptw {
     }
 
     void EA::calFeature() {
+        population_features = std::vector<std::vector<double>> (population.size(), std::vector<double> (2));
         std::vector<Solution::ptr> p1 = population;
         std::vector<Solution::ptr> p2 = population;
         std::ranges::sort(p1.begin(), p1.end(), [&](const Solution::ptr&a, const Solution::ptr& b) {
@@ -635,16 +634,16 @@ namespace vrptw {
         std::ranges::sort(p2.begin(), p2.end(), [&](const Solution::ptr&a, const Solution::ptr& b) {
             return a->getTotalDistance() < b->getTotalDistance();
         });
-        double score1 = 1, score2 = 1;
+        double score1 = 1.00, score2 = 1.00;
         for (const auto& s : p1) {
             const auto index = std::ranges::distance(population.begin(), std::ranges::find(population, s));
             population_features[index][0] = score1;
-            score1 -= 1 / static_cast<double>(population_size);
+            score1 -= 1.00 / static_cast<double>(population_size);
         }
         for (const auto& s : p2) {
             const auto index = std::ranges::distance(population.begin(), std::ranges::find(population, s));
             population_features[index][1] = score2;
-            score2 -= 1 / static_cast<double>(population_size);
+            score2 -= 1.00 / static_cast<double>(population_size);
         }
     }
 
@@ -660,9 +659,9 @@ namespace vrptw {
     }
 
     void EA::encode() {
-        population_codes = std::vector<std::vector<int>> (population.size(), std::vector<int> (problem->getCustomerNumber()));
+        population_codes = std::vector<std::vector<double>> (population.size(), std::vector<double> (problem->getCustomerNumber()));
         for (size_t i = 0; i < population.size(); ++i) {
-            std::vector<int> code(problem->getCustomerNumber());
+            std::vector<double> code(problem->getCustomerNumber());
             size_t index = 0;
             for (const auto& route : population[i]->getRoutes()) {
                 for (const auto& customer : route->getCustomers()) {
@@ -673,18 +672,18 @@ namespace vrptw {
         }
     }
 
-    Solution::ptr EA::decode(const std::vector<int>& code) const {
+    Solution::ptr EA::decode(const std::vector<double>& code) const {
         std::vector<std::vector<Customer::ptr>> routes;
         routes.emplace_back(2, problem->getDepot());
         size_t i = 0;
         while (i < code.size()) {
             const size_t index = routes.size() - 1;
-            routes[index].insert(routes[index].end() - 1, problem->getCustomerById(code[i]));
+            routes[index].insert(routes[index].end() - 1, problem->getCustomerById(static_cast<int>(code[i])));
             if (Route::ptr temp_route(new Route(routes[index], problem->getDistanceMatrix(), problem->getTimeMatrix()));
                 !constraints(temp_route, problem)) {
                 routes[index].erase(routes[index].end() - 2);
                 routes.emplace_back(2, problem->getDepot());
-                routes.back().insert(routes.back().end() - 1, problem->getCustomerById(code[i]));
+                routes.back().insert(routes.back().end() - 1, problem->getCustomerById(static_cast<int>(code[i])));
             }
             ++i;
         }

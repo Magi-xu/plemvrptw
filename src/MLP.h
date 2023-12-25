@@ -7,7 +7,6 @@
 
 #include <torch/torch.h>
 
-
 namespace vrptw{
 
     struct MLP : torch::nn::Module {
@@ -32,8 +31,18 @@ namespace vrptw{
         torch::nn::ReLU relu;
         torch::nn::Sigmoid sigmoid;
 
-        torch::nn::MSELoss criterion;
-        torch::optim::Adam optimizer(model->parameters(), torch::optim::AdamOptions(learning_rate));
+        // torch::nn::MSELoss criterion;
+        // torch::optim::Adam optimizer;
+        std::shared_ptr<torch::optim::Optimizer> optimizer;
+        std::shared_ptr<torch::nn::MSELoss> criterion;
+        // torch::optim::Adam optimizer(model->parameters(), torch::optim::AdamOptions(learning_rate));
+
+        std::tuple<torch::Tensor, torch::Tensor> toTensor(std::vector<std::vector<double>>& population_codes, std::vector<std::vector<double>>& population_features);
+        void defOptimizer(const double& learning_rate);
+        void defCriterion();
+        void trainModel(torch::Tensor& ts_population_codes, torch::Tensor& ts_population_features, const int& epochs);
+        torch::Tensor predict(torch::Tensor& ts_population_codes);
+        std::tuple<std::vector<size_t>, std::vector<size_t>> toVector(torch::Tensor& predicted_outputs, const double& p);
     };
 
 } //vrptw

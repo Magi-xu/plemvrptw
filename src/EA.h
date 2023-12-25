@@ -20,13 +20,12 @@ namespace vrptw {
 
         void setPopulation_size(const size_t& size) {
             population_size = size;
-            population_features = std::vector<std::vector<double>> (size, std::vector<double> (2));
         }
         void setIterations(const int& iters) { iterations = iters;}
 
         [[nodiscard]] const std::vector<Solution::ptr>& getPopulation() const { return population;}
-        [[nodiscard]] const std::vector<std::vector<int>>& getCodes() const { return population_codes;}
-        [[nodiscard]] const std::vector<std::vector<double>>& getFeatures() const { return population_features;}
+        [[nodiscard]] std::vector<std::vector<double>>& getCodes() { return population_codes;}
+        [[nodiscard]] std::vector<std::vector<double>>& getFeatures() { return population_features;}
 
         [[nodiscard]] bool checkUniqueness(const Solution::ptr& s) ;
 
@@ -42,7 +41,7 @@ namespace vrptw {
         void cullPopulation();
 
         void encode();
-        [[nodiscard]] Solution::ptr decode(const std::vector<int>& code) const;
+        [[nodiscard]] Solution::ptr decode(const std::vector<double>& code) const;
 
         void generate(const std::vector<size_t>& i1, const std::vector<size_t>& i2);
 
@@ -54,7 +53,7 @@ namespace vrptw {
         int iterations = 0;
 
         std::vector<std::vector<double>> crowdingDistanceMatrix;
-        std::vector<std::vector<int>> population_codes;
+        std::vector<std::vector<double>> population_codes;
         std::vector<std::vector<double>> population_features;
 
         void normal_random_init();

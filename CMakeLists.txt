@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.27)
 project(plemvrptw)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_PREFIX_PATH "C:/Users/aqdxg/libtorch/share/cmake/Torch")
+set(Torch_DIR /lib/libtorch/share/cmake/Torch)
 
-#find_package(Torch REQUIRED)
+find_package(Torch REQUIRED)
 
 add_executable(
         plemvrptw main.cpp

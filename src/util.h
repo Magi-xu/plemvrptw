@@ -47,11 +47,11 @@ namespace vrptw {
         return ea;
     }
 
-    // inline MLP::ptr initMLP(const int64_t& input_size, const int64_t& hidden_size, const int64_t& output_size) {
-    //     const auto model = std::make_shared<MLP>(input_size, hidden_size, output_size);
-    //     return model;
-    // }
-    //
+    inline MLP::ptr initMLP(const int64_t& input_size, const int64_t& hidden_size, const int64_t& output_size) {
+        const auto model = std::make_shared<MLP>(input_size, hidden_size, output_size);
+        return model;
+    }
+    
     // inline std::tuple<torch::Tensor, torch::Tensor> toTensor(const std::vector<std::vector<int>>& population_codes, const std::vector<std::vector<double>>& population_features) {
     //     torch::Tensor ts_population_codes = torch::from_blob(population_codes.data(), {
     //         static_cast<long>(population_codes.size()), static_cast<long>(population_codes[0].size())
@@ -61,18 +61,18 @@ namespace vrptw {
     //     }, torch::kDouble);
     //     return {ts_population_codes, ts_population_features};
     // }
-    //
+    
     // using OptimizerPtr = std::shared_ptr<torch::optim::Optimizer>;
     // using CriterionPtr = std::shared_ptr<torch::nn::MSELoss>;
-    //
+    
     // inline OptimizerPtr defOptimizer(MLP::ptr& model, const double& learning_rate) {
     //     return std::make_shared<torch::optim::Adam>(model->parameters(), torch::optim::AdamOptions(learning_rate));
     // }
-    //
+    
     // inline CriterionPtr defCriterion() {
     //     return std::make_shared<torch::nn::MSELoss>();
     // }
-    //
+    
     // inline void trainModel(MLP::ptr& model, torch::Tensor& ts_population_codes, torch::Tensor& ts_population_features, const int& epochs, OptimizerPtr& optimizer, CriterionPtr& criterion) {
     //     for (int epoch = 0; epoch < epochs; ++epoch) {
     //         torch::Tensor outputs = model->forward(ts_population_codes);
@@ -82,11 +82,11 @@ namespace vrptw {
     //         optimizer->step();
     //     }
     // }
-    //
+    
     // inline torch::Tensor predict(MLP::ptr& model, torch::Tensor& ts_population_codes) {
     //     return model->forward(ts_population_codes);
     // }
-    //
+    
     // inline std::tuple<std::vector<int>, std::vector<int>> toVector(torch::Tensor& predicted_outputs, const double& p) {
     //     auto size = predicted_outputs.sizes();
     //     auto data_accessor = predicted_outputs.accessor<double, 2>();
