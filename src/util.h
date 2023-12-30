@@ -12,25 +12,32 @@
 #include <filesystem>
 #include <ctime>
 
+#include "MLP.h"
+#include "EA.h"
+#include "Problem.h"
+#include "Customer.h"
+#include "Route.h"
+#include "Solution.h"
+
 namespace vrptw {
 
-    inline bool constraints(const Route::ptr& route, const Problem::ptr& problem);
+    bool constraints(const Route::ptr& route, const Problem::ptr& problem);
 
-    inline double euclideanDistance(const std::vector<double>& individual1, const std::vector<double>& individual2);
+    double euclideanDistance(const std::vector<double>& individual1, const std::vector<double>& individual2);
 
-    inline Problem::ptr initProblem(const std::string& data_name, const double& vehicle_speed, const double& delay_time_allow);
+    Problem::ptr initProblem(const std::string& data_name, const double& vehicle_speed, const double& delay_time_allow);
 
-    inline EA::ptr initModel(const Problem::ptr& problem, const size_t& population_size, const int& iterations);
+    EA::ptr initModel(const Problem::ptr& problem, const size_t& population_size, const int& iterations);
 
-    inline MLP::ptr initMLP(const int64_t& input_size, const int64_t& hidden_size, const int64_t& output_size);
+    MLP::ptr initMLP(const int64_t& input_size, const int64_t& hidden_size, const int64_t& output_size);
     
-    inline void printRoute(const Route::ptr& route);
+    void printRoute(const Route::ptr& route);
 
-    inline void printRoute(const std::vector<Customer::ptr>& route);
+    void printRoute(const std::vector<Customer::ptr>& route);
 
-    inline void printSolution(const Solution::ptr& solution, const bool& detal=true);
+    void printSolution(const Solution::ptr& solution, const bool& detal=true);
 
-    inline void writeToFile(const Solution::ptr& solution, const std::string& data_name);
+    void writeToFile(const Solution::ptr& solution, const std::string& data_name);
 
 } //vrptw
 
