@@ -11,6 +11,6 @@
 #include "Customer.cpp"
 #include "Route.cpp"
 #include "Solution.cpp"
-#include "util.h"
+#include "util.cpp"
 
 #endif //PLEMVRPTW_PLEMVRPTW_H
